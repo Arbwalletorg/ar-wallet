@@ -1,13 +1,16 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const mongoose = require("mongoose");
-
 
 // Load env
 dotenv.config();
 
 const app = express();
+
+// =========================
+// 🔥 MIDDLEWARE (IMPORTANT)
+// =========================
 app.use(cors());
 app.use(express.json());
 
@@ -16,10 +19,7 @@ app.use(express.json());
 // =========================
 mongoose.connect(process.env.MONGO_URL)
   .then(() => console.log("✅ MongoDB Connected"))
-  .catch((err) => {
-    console.log("❌ FULL DB ERROR:");
-    console.log(err);
-  });
+  .catch((err) => console.log("❌ DB Error:", err));
 
 // =========================
 // 📦 Schema & Model
@@ -42,65 +42,71 @@ const User = mongoose.model("User", userSchema);
 // 🏠 Test Route
 // =========================
 app.get("/", (req, res) => {
-  res.send("Server is running ✅");
+  res.json({ message: "Server is running ✅" });
 });
 
 // =========================
-// 📝 Register
+// 📝 REGISTER ROUTE
 // =========================
 app.post("/register", async (req, res) => {
   try {
+    console.log("REGISTER HIT");
+
     const { phone, password } = req.body;
 
     if (!phone || !password) {
-      return res.status(400).send("Missing phone or password");
+      return res.status(400).json({ message: "Missing phone or password" });
     }
 
     const existingUser = await User.findOne({ phone });
     if (existingUser) {
-      return res.status(400).send("User already exists");
+      return res.status(400).json({ message: "User already exists" });
     }
 
     const user = new User({ phone, password });
     await user.save();
 
-   return res.json("User registered successfully ✅");
+    return res.json({ message: "User registered successfully ✅" });
+
   } catch (err) {
     console.log(err);
-    res.status(500).send("Server error");
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
 // =========================
-// 🔐 Login
+// 🔐 LOGIN ROUTE
 // =========================
 app.post("/login", async (req, res) => {
   try {
+    console.log("LOGIN HIT");
+
     const { phone, password } = req.body;
 
     if (!phone || !password) {
-      return res.status(400).send("Missing data");
+      return res.status(400).json({ message: "Missing data" });
     }
 
     const user = await User.findOne({ phone });
 
     if (!user) {
-      return res.status(404).send("User not found");
+      return res.status(404).json({ message: "User not found" });
     }
 
     if (user.password !== password) {
-      return res.status(401).send("Invalid credentials");
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    return res.json("Login successful ✅");
+    return res.json({ message: "Login successful ✅" });
+
   } catch (err) {
     console.log(err);
-    res.status(500).send("Server error");
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
 // =========================
-// 🚀 Start Server
+// 🚀 START SERVER
 // =========================
 const PORT = process.env.PORT || 5000;
 
