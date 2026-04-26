@@ -220,36 +220,24 @@
 
     </script>
 <script>
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const phone = document.getElementById('phone').value;
-    const password = document.getElementById('password').value;
-
-    try {
-        console.log("Sending request...");
-
-        const response = await fetch('https://backend-2-4bih.onrender.com/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ phone, password })
-        });
-
-        console.log("Response status:", response.status);
-
-        const data = await response.text();
-        console.log("Response data:", data);
-
-        alert(data);
-
-    } catch (error) {
-        console.log("FULL ERROR:", error);
-        alert("Error: " + error.message);
-    }
-});
+function login() {
+  fetch("https://backend-2-4bih.onrender.com/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      username: "test",
+      password: "123"
+    })
+  })
+  .then(res => res.json())
+  .then(data => console.log(data))
+  .catch(err => console.log(err));
+}
 </script>
+
+<button onclick="login()">Login</button>
 
  
 </body>

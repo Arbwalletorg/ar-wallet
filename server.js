@@ -64,7 +64,7 @@ app.post("/register", async (req, res) => {
     const user = new User({ phone, password });
     await user.save();
 
-    res.send("User registered successfully ✅");
+   return res.json("User registered successfully ✅");
   } catch (err) {
     console.log(err);
     res.status(500).send("Server error");
@@ -92,7 +92,7 @@ app.post("/login", async (req, res) => {
       return res.status(401).send("Invalid credentials");
     }
 
-    res.send("Login successful ✅");
+    return res.json("Login successful ✅");
   } catch (err) {
     console.log(err);
     res.status(500).send("Server error");
